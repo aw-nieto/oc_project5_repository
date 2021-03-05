@@ -9,10 +9,9 @@ from P5_03_final import main
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/data_preprocessing')
 def get():
     data = main('../input/unlabeled_data.csv')
-    data = data.iloc[:2,:].to_dict()       # convert dataframe to dict
     return {'data': data}, 200  # return data and 200 OK
 
 if __name__ == "__main__":
