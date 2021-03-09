@@ -25,7 +25,16 @@ def comments_to_words(comment):
     lowered = comment.lower()
     normalized = remove_accents(lowered)
     tokens = nltk.tokenize.word_tokenize(normalized)
-    words = tuple(t for t in tokens if t not in stopwords and t.isalpha())
+
+    mwetokenizer = nltk.tokenize.mwe.MWETokenizer(separator='')
+    mwe_list = [('c', '#'), ('C', '#'), ('f', '#'), ('F', '#')]
+    for mwe in mwe_list:
+        mwetokenizer.add_mwe(mwe)
+    tokens = mwetokenizer.tokenize(tokens)
+
+    words = tuple(t for t in tokens if t not in stopwords and
+                  ((t.isalnum() and not t.isdigit()) or ('#' in t)) and
+                  (len(t) > 1))
     return words
 
 
@@ -34,16 +43,16 @@ def raw_text_to_words(raw_comment):
     """
 
     # 1. Remove HTML
-    comment_text = BeautifulSoup(raw_comment)
+    comment_text = BeautifulSoup(raw_comment, 'html.parser')
 
     # 2. Remove non-letters non-digits
-    letters_only = re.sub("[^a-zA-Z0-9]", " ", comment_text.get_text())
+    letters_only = re.sub("[^a-zA-Z0-9#+.]", " ", comment_text.get_text())
 
     # 3. Convert to lower case, remove accents, tokenize
     # and remove stop words
     meaningful_words = comments_to_words(letters_only)
 
-    # 4.lemmatization
+    # 4. Lemmatization
     lemmatizer = WordNetLemmatizer()
     meaningful_words_lemmatized = tuple(lemmatizer.lemmatize(t)
                                         for t in meaningful_words)
@@ -57,7 +66,11 @@ def main(*args):
     
     raw_data['Comment'] = raw_data.Title + '\n\n' + raw_data.Body
     
+    raw_data = raw_data.sample(frac=.2, random_state=47)
+    #n_features = len(raw_data)
+    
     raw_data['Words'] = raw_data['Comment']\
         .apply(lambda raw_text: raw_text_to_words(raw_text))
+        
     
-    return raw_data.iloc[1, :].to_dict()
+    return raw_data.iloc[:10, -1].to_dict()
