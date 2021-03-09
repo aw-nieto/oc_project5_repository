@@ -5,8 +5,6 @@ Created on Thu Mar  4 16:21:42 2021
 @author: AzertWay
 """
 import pandas as pd
-import numpy as np
-
 from bs4 import BeautifulSoup
 import re
 import unicodedata
@@ -61,7 +59,7 @@ def raw_text_to_words(raw_comment):
     return(" ".join(meaningful_words_lemmatized))
 
 
-def main(*args):
+def classification(*args):
     raw_data = pd.read_csv(*args)
     
     raw_data['Comment'] = raw_data.Title + '\n\n' + raw_data.Body
@@ -74,3 +72,37 @@ def main(*args):
         
     
     return raw_data.iloc[:10, -1].to_dict()
+
+def append_data(args):
+    raw_data = pd.read_csv(args['file_path'])
+    
+    if int(args['Id']) in list(raw_data['Id']):
+        return f"'{args['Id']}' already exists.", 409
+
+    else:
+        # create new dataframe containing new values
+        new_data = pd.DataFrame({
+            'Id': [args['Id']],
+            'Title': [args['Title']],
+            'Body': [args['Body']]
+        })
+        
+        # add the newly provided values
+        raw_data = raw_data.append(new_data, ignore_index=True)
+        raw_data.to_csv(args['file_path'], index=False)
+        return raw_data.iloc[-1, -1], 201
+
+def delete_data(args):
+    raw_data = pd.read_csv(args['file_path'])
+    
+    if int(args['Id']) in list(raw_data['Id']):
+        # remove data entry matching given userId
+        raw_data = raw_data[raw_data['Id'] != int(args['Id'])]
+            
+        # save back to CSV
+        raw_data.to_csv(args['file_path'], index=False)
+        # return data and 200 OK
+        return None, 204
+    else:
+        # otherwise we return 404 because Id does not exist
+        return f"'{args['Id']}' user not found.", 404
