@@ -15,11 +15,36 @@ stopwords = set(nltk.corpus.stopwords.words('english'))
 
 
 def remove_accents(text):
+    '''Given text, removes the accents
+
+    Parameters
+    ----------
+    text: str
+
+    Returns
+    -------
+    str (text without accents)
+
+    '''
+
     return unicodedata.normalize('NFKD', text)\
             .encode('ascii', errors='ignore').decode('utf-8')
 
 
 def comments_to_words(comment):
+    ''' Puts the comment in lower case, removes accents, tokenizes the text
+    and returns the tokens
+
+    Parameters
+    ----------
+    comment: str
+
+    Returns
+    -------
+    tuple (tokens)
+
+    '''
+
     lowered = comment.lower()
     normalized = remove_accents(lowered)
     tokens = nltk.tokenize.word_tokenize(normalized)
@@ -37,8 +62,17 @@ def comments_to_words(comment):
 
 
 def raw_text_to_words(raw_comment):
-    """ Convert a raw comment into a string of words
-    """
+    ''' Convert a raw comment into a string of words
+
+    Parameters
+    ----------
+    raw_comment: str
+
+    Returns
+    -------
+    str (assembled lemmatized tokens)
+
+    '''
 
     # 1. Remove HTML
     comment_text = BeautifulSoup(raw_comment, 'html.parser')
@@ -60,6 +94,9 @@ def raw_text_to_words(raw_comment):
 
 
 def classification(*args):
+    ''' Given a corpus returns the tags associated with each comment
+    '''
+
     raw_data = pd.read_csv(*args)
     
     raw_data['Comment'] = raw_data.Title + '\n\n' + raw_data.Body
@@ -74,6 +111,9 @@ def classification(*args):
     return raw_data.iloc[:10, -1].to_dict()
 
 def append_data(args):
+    ''' adds a new comment in the corpus
+    '''
+
     raw_data = pd.read_csv(args['file_path'])
     
     if int(args['Id']) in list(raw_data['Id']):
@@ -93,6 +133,9 @@ def append_data(args):
         return raw_data.iloc[-1, -1], 201
 
 def delete_data(args):
+    ''' drops a comment from the corpus
+    '''
+
     raw_data = pd.read_csv(args['file_path'])
     
     if int(args['Id']) in list(raw_data['Id']):
