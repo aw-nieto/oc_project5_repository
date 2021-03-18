@@ -144,7 +144,7 @@ three-merge==0.1.1
 toml==0.10.1
 tornado==6.1
 tqdm==4.56.0
-traitlets==5.0.5
+traitlets==4.3.3
 ujson==4.0.2
 urllib3==1.26.3
 waitress==2.0.0
