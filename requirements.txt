@@ -116,7 +116,6 @@ QtPy==1.9.0
 regex==2021.3.17
 requests==2.25.1
 rope==0.18.0
-Rtree==0.9.4
 s3transfer==0.3.4
 scikit-learn==0.24.1
 scipy==1.6.1
