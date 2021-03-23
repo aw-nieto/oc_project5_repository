@@ -8,3 +8,6 @@ beautifulsoup4==4.9.3
 regex==2021.3.17
 scikit-learn==0.24.1
 gensim==3.8.3
+waitress==2.0.0
+flask==1.1.2
+flask-restful==0.3.8
