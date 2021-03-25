@@ -1,1 +1,1 @@
-web: waitress-serve --port=$PORT --call 'P5_04_API:app'
+web: waitress-serve --port=$PORT P5_04_API:app
