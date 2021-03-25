@@ -27,7 +27,7 @@ def post():
         'METHOD': 'POST'
     }), data[1]
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     return '<h1>OpenClassrooms - Projet 5 - Catégorisez des questions</h1>'
 
