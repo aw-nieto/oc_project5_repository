@@ -8,7 +8,9 @@ from bs4 import BeautifulSoup
 import re
 import unicodedata
 import nltk
+import numpy as np
 from nltk.stem import WordNetLemmatizer
+from joblib import load
 
 stopwords = set(nltk.corpus.stopwords.words('english'))
 
@@ -88,7 +90,14 @@ def raw_text_to_words(raw_comment):
                                         for t in meaningful_words)
 
     # 5. Join the words back into one string separated by space
-    return(" ".join(meaningful_words_lemmatized))
+    return " ".join(meaningful_words_lemmatized)
+
+
+def remove_nan(y):
+    for i in range(len(y)):
+        y[i] = list(y[i])
+        if 'nan' in y[i]:
+            y[i].remove('nan')
 
 
 def classification(args):
@@ -99,4 +108,11 @@ def classification(args):
     
     lemmitized_words = raw_text_to_words(comment)
     
-    return lemmitized_words, 200
+    clf = load('final_model.joblib')
+    encoder = load('encoder.joblib')
+    
+    tags_b = clf.predict([lemmitized_words])
+    tags = encoder.inverse_transform(tags_b)
+    remove_nan(tags)
+    
+    return tags, 200
