@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 import re
 import unicodedata
 import nltk
-import numpy as np
 from nltk.stem import WordNetLemmatizer
 from joblib import load
 
@@ -29,7 +28,7 @@ def remove_accents(text):
     '''
 
     return unicodedata.normalize('NFKD', text)\
-            .encode('ascii', errors='ignore').decode('utf-8')
+        .encode('ascii', errors='ignore').decode('utf-8')
 
 
 def comments_to_words(comment):
@@ -94,6 +93,13 @@ def raw_text_to_words(raw_comment):
 
 
 def remove_nan(y):
+    ''' Remove 'nan' from the list of predicted tags
+
+    Parameters
+    ----------
+    y: list of tuples
+
+    '''
     for i in range(len(y)):
         y[i] = list(y[i])
         if 'nan' in y[i]:
@@ -102,17 +108,31 @@ def remove_nan(y):
 
 def classification(args):
     ''' Given a corpus returns the tags associated with each comment
+
+    Parameters
+    ----------
+    args: dict
+
+    Returns
+    -------
+    tags: 2d list
+    http status code: int
+
     '''
-    
+
+    # the comment's title and body are being concatenated
     comment = args['Title'] + '\n\n' + args['Body']
-    
+
+    # preprocessing
     lemmitized_words = raw_text_to_words(comment)
-    
+
+    # loading of the estimator and label encoder
     clf = load('final_model.joblib')
     encoder = load('encoder.joblib')
-    
+
+    # tag prediction
     tags_b = clf.predict([lemmitized_words])
     tags = encoder.inverse_transform(tags_b)
     remove_nan(tags)
-    
+
     return tags, 200

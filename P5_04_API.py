@@ -20,6 +20,7 @@ def post():
     parser.add_argument('Body', required=True)
     args = parser.parse_args()  # parse arguments to dictionary
 
+    # from comment predicts the associated tags
     data = classification(args)
 
     return jsonify({
@@ -27,12 +28,14 @@ def post():
         'METHOD': 'POST'
     }), data[1]
 
+
 @app.route('/', methods=['GET'])
 def index():
     return '<h1>OpenClassrooms - Projet 5 - Catégorisez des questions</h1>'
 
+
 def get_port():
-  return int(os.environ.get("PORT", 5000))
+    return int(os.environ.get("PORT", 5000))
 
 
 if __name__ == "__main__":
