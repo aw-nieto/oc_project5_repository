@@ -116,9 +116,6 @@ def classification(args):
     Returns
     -------
     tags: 2d list
-    or
-    error message: str
-    
     http status code: int
 
     '''
@@ -138,7 +135,7 @@ def classification(args):
     tags = encoder.inverse_transform(tags_b)
     remove_nan(tags)
 
-    if len(tags[0] > 1):
+    if len(tags[0]) > 0:
         return tags, 200
     else:
         return 'No tags were found', 404
