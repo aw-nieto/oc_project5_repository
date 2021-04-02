@@ -16,6 +16,7 @@ OpenClassrooms - Projet5 - Catégorisez automatiquement des questions
 ### example code
 * Note (Comment_Title and Comment_Body are to be replaced)
 
+'''python
 import requests
 json_request = {
     'Title': <Comment_Title>,
@@ -25,12 +26,14 @@ json_request = {
 r = requests.post('https://oc-p5-app.herokuapp.com/label/', json=json_request)
 print(f'HTTP Status Code: {r.status_code}')
 print(r.json())
+'''
 
 * If there is not any tag predicted, return 404 status
 
 ### examples
 
 * e1 
+
 Title: 	What is the correct JSON content type?
 Body:	I've been messing around with JSON for some time, just pushing it out as text and it hasn't hurt anybody (that I know of), but I'd like to start doing things properly.
 	I have seen so many purported "standards" for the JSON content type:
