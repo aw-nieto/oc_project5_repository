@@ -4,10 +4,138 @@ Created on Thu Mar  4 16:21:42 2021
 
 @author: AzertWay
 """
-import pandas as pd
+from bs4 import BeautifulSoup
+import re
+import unicodedata
+import nltk
+from nltk.stem import WordNetLemmatizer
+from joblib import load
 
-def data_import(path):
-    return pd.read_csv(path)
+stopwords = set(nltk.corpus.stopwords.words('english'))
 
-def main(*args):
-    return data_import(*args)
+
+def remove_accents(text):
+    '''Given text, removes the accents
+
+    Parameters
+    ----------
+    text: str
+
+    Returns
+    -------
+    str (text without accents)
+
+    '''
+
+    return unicodedata.normalize('NFKD', text)\
+        .encode('ascii', errors='ignore').decode('utf-8')
+
+
+def comments_to_words(comment):
+    ''' Puts the comment in lower case, removes accents, tokenizes the text
+    and returns the tokens
+
+    Parameters
+    ----------
+    comment: str
+
+    Returns
+    -------
+    tuple (tokens)
+
+    '''
+
+    lowered = comment.lower()
+    normalized = remove_accents(lowered)
+    tokens = nltk.tokenize.word_tokenize(normalized)
+
+    mwetokenizer = nltk.tokenize.mwe.MWETokenizer(separator='')
+    mwe_list = [('c', '#'), ('C', '#'), ('f', '#'), ('F', '#')]
+    for mwe in mwe_list:
+        mwetokenizer.add_mwe(mwe)
+    tokens = mwetokenizer.tokenize(tokens)
+
+    words = tuple(t for t in tokens if t not in stopwords and
+                  ((t.isalnum() and not t.isdigit()) or ('#' in t)))
+    return words
+
+
+def raw_text_to_words(raw_comment):
+    ''' Convert a raw comment into a string of words
+
+    Parameters
+    ----------
+    raw_comment: str
+
+    Returns
+    -------
+    str (assembled lemmatized tokens)
+
+    '''
+
+    # 1. Remove HTML
+    comment_text = BeautifulSoup(raw_comment, 'html.parser')
+
+    # 2. Remove non-letters non-digits
+    letters_only = re.sub("[^a-zA-Z0-9#+.-]", " ", comment_text.get_text())
+
+    # 3. Convert to lower case, remove accents, tokenize
+    # and remove stop words
+    meaningful_words = comments_to_words(letters_only)
+
+    # 4. Lemmatization
+    lemmatizer = WordNetLemmatizer()
+    meaningful_words_lemmatized = tuple(lemmatizer.lemmatize(t)
+                                        for t in meaningful_words)
+
+    # 5. Join the words back into one string separated by space
+    return " ".join(meaningful_words_lemmatized)
+
+
+def remove_nan(y):
+    ''' Remove 'nan' from the list of predicted tags
+
+    Parameters
+    ----------
+    y: list of tuples
+
+    '''
+    for i in range(len(y)):
+        y[i] = list(y[i])
+        if 'nan' in y[i]:
+            y[i].remove('nan')
+
+
+def classification(args):
+    ''' Given a corpus returns the tags associated with each comment
+
+    Parameters
+    ----------
+    args: dict
+
+    Returns
+    -------
+    tags: 2d list
+    http status code: int
+
+    '''
+
+    # the comment's title and body are being concatenated
+    comment = args['Title'] + '\n\n' + args['Body']
+
+    # preprocessing
+    lemmitized_words = raw_text_to_words(comment)
+
+    # loading of the estimator and label encoder
+    clf = load('final_model.joblib')
+    encoder = load('encoder.joblib')
+
+    # tag prediction
+    tags_b = clf.predict([lemmitized_words])
+    tags = encoder.inverse_transform(tags_b)
+    remove_nan(tags)
+
+    if len(tags[0]) > 0:
+        return tags, 200
+    else:
+        return 'No tags were found', 404
