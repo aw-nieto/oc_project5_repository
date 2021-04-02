@@ -13,7 +13,7 @@ OpenClassrooms - Projet5 - Catégorisez automatiquement des questions
 * Title (document's Title)
 * Body (document's Body)
 
-### example
+### examples
 import requests
 json_request = {
     'Title': 'How can I remove a specific item from an array?',
