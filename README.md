@@ -35,6 +35,7 @@ print(r.json())
 * e1 
 
 Title: 	What is the correct JSON content type?
+
 Body:	I've been messing around with JSON for some time, just pushing it out as text and it hasn't hurt anybody (that I know of), but I'd like to start doing things properly.
 	I have seen so many purported "standards" for the JSON content type:
 	application/json
@@ -48,7 +49,9 @@ Body:	I've been messing around with JSON for some time, just pushing it out as t
 -> Predicted: json
 
 * e2
+
 Title: 	What is the “-->” operator in C/C++?
+
 Body: 	After reading Hidden Features and Dark Corners of C++/STL on comp.lang.c++.moderated, I was completely surprised that the following snippet compiled and worked in both Visual Studio 2008 and G++ 4.4.
 	Here's the code:
 	#include <stdio.h>
