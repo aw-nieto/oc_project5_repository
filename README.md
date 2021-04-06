@@ -3,6 +3,12 @@ OpenClassrooms - Projet5 - Catégorisez automatiquement des questions
 
 ## How to use the API ?
 
+### Resources
+* Github: https://github.com/aw-nieto/oc_project5_repository
+* Heroku: https://oc-p5-app.herokuapp.com/
+
+Note: The heroku server will probably be down (hence not usable)
+
 ### Endpoint
 * label
 
